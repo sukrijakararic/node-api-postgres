@@ -4,23 +4,19 @@ const app = express()
 const db = require('./queries')
 const port = 3000
 const cors = require('cors')
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
+//const passport = require('passport');
+//const LocalStrategy = require('passport-local').Strategy;
 const helmet = require('helmet');
 
 app.use(cors());
 app.use(helmet());
 
-app.use(bodyParser.json())
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-)
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(passport.initialize());
-app.use(new LocalStrategy((username, password, done) => {
-  function checkUser(error, user) {
+ /** app.use(passport.initialize());
+passport.use(new LocalStrategy((username, password, done) => {
+  db.getUserByUsername(username, (error, user) => {
     if (error) {
       return done(error);
     }
@@ -31,9 +27,8 @@ app.use(new LocalStrategy((username, password, done) => {
       return done(null, false, { message: 'Incorrect password.' });
     }
     return done(null, user);
-  }
-  db.getUserByUsername(username, checkUser);
-}))
+  });
+}));
 
 app.get('/', (request, response) => {
   response.json({ info: 'Node.js, Express, and Postgres API' })
@@ -41,18 +36,24 @@ app.get('/', (request, response) => {
 
 app.get('/users', db.getUsers)
 app.get('/users/:id', db.getUserById)
-app.post('/users', passport.authenticate('local', {failureRedirect: '/'}), db.createUser)
-app.put('/users/:id', passport.authenticate('local', {failureRedirect: '/'}), db.updateUser)
-app.delete('/users/:id', passport.authenticate('local', {failureRedirect: '/'}), db.deleteUser)
+app.post('/users', passport.authenticate('local', { failureRedirect: '/' }), db.createUser)
+app.put('/users/:id', passport.authenticate('local', { failureRedirect: '/' }), db.updateUser)
+app.delete('/users/:id', passport.authenticate('local', { failureRedirect: '/' }), db.deleteUser) **/
+
+app.get('/users', db.getUsers)
+app.get('/users/:id', db.getUserById)
+app.post('/users', db.createUser)
+app.put('/users/:id', db.updateUser)
+app.delete('/users/:id', db.deleteUser)
 
 app.use((req, res, next ) => {
-  const error = new Error('Something went wrong')
-  next(error)
+  const error = new Error('Something went wrong');
+  next(error);
 })
 app.use((error, request, response, next) => {
-  console.error('Error: ', error.message)
-  res.status(500).send('Internal Server Error');
-})
+  console.error('Error: ', error.message);
+  response.status(500).send('Internal Server Error');
+});
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)
 })
