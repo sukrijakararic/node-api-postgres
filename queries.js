@@ -6,6 +6,8 @@ const pool = new Pool({
   password: 'password',
   port: 5432,
 })
+
+//This is all middleware that will be used by the api to make the queries to the database.
 const getUsers = (request, response) => {
   pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
     if (error) {
@@ -64,6 +66,8 @@ const deleteUser = (request, response) => {
   })
 }
 
+
+//exporting the queries
 module.exports = {
   getUsers,
   getUserById,
